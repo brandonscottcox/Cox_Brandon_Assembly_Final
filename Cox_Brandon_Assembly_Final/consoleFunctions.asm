@@ -39,7 +39,6 @@ _printLine:
 printLine ENDP
 
 input PROC near
-_input:
 
     call readline
 

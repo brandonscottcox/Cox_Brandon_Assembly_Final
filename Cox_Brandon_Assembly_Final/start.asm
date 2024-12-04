@@ -19,17 +19,18 @@ PUBLIC titlePrompt
 .code
 
 startScreen PROC near
-    call initialize_console       ; Call to set up the console for output
+    call initialize_console         ; Call to set up the console for output
         
-    call nameTitle
+    call nameTitle                  ; function that prints game title
 
     call newline
     call newline
 
     push offset enterPrompt
-    call printLine
+    call printLine                  ; prints enter prompt
 
-    call input
+    ; may be redundant
+    call input                      ; used to stop program and ask user for input to continue
 
     ret
 startScreen ENDP
@@ -37,16 +38,16 @@ startScreen ENDP
 nameTitle PROC near
 
     push offset titleBar
+    call printLine                  ; print bar UI
+
+    call newline
+
+    push offset titlePrompt         ; print game title
     call printLine
 
     call newline
 
-    push offset titlePrompt
-    call printLine
-
-    call newline
-
-    push offset titleBar
+    push offset titleBar            ; print bar UI
     call printLine
 
     ret

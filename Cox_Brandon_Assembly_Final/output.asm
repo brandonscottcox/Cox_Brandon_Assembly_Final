@@ -10,25 +10,25 @@ extern player: DWORD
 PUBLIC board
 
 .data
-    boardIndex DWORD 0
+    boardIndex DWORD 0 ; holds current board index
 
     boardBuffer DB ?, 0 ; buffer used for user input
-    space DB '  ', 0
-    line DB '|', 0
-    bar DB        "  |-----|-----|-----|-----|-----|", 0
-    barLetters DB "     A     B     C     D     E", 0
-    row DWORD 1 
+    space DB '  ', 0    ; variable used spaces for array and UI
+    line DB '|', 0      ; variable used for lines inbetween array and UI 
+    bar DB        "  |-----|-----|-----|-----|-----|", 0    ; variable used for UI
+    barLetters DB "     A     B     C     D     E", 0       ; variable used for UI
+    row DWORD 1 ; variable that holds row for UI
 
+    ; array that holds game data, starts by holding empty spaces
     board DB    ' ', ' ', ' ', ' ', ' ',     
                 ' ', ' ', ' ', ' ', ' ',     
                 ' ', ' ', ' ', ' ', ' ',     
                 ' ', ' ', ' ', ' ', ' ',     
                 ' ', ' ', ' ', ' ', ' '  
 
-
-    playerTitle DB "      - Player ", 0
-    roundTitle DB  "- Round ", 0
-    endDash DB "-", 0
+    playerTitle DB "      - Player ", 0 ;UI
+    roundTitle DB  "- Round ", 0        ;UI
+    endDash DB "-", 0                   ;UI
 
 .code
 
@@ -36,24 +36,22 @@ output PROC near
 
     LOCAL i:DWORD
 
-
     call newline
 
-    call nameTitle
+    call nameTitle ; function for title of game UI
 
     call newline
     call newline
     call newline
 
-    call gameData
+    call gameData ; function that holds information about game, round, and current player UI
 
     mov i, 0 ; sets ecx to 0 which will be our loop condition (how many times we loop)
     loop_start:
         cmp i, 25    ; compares eax register (i) with 25
         jge end_loop   ; ends loop if i >= 25
 
-        ;------------------------------------------------
-                        ; if (output loop is on 5(n) iterations)
+            ; if (output loop is on 5(n) iterations)
             mov eax, i
             xor edx, edx  ; Clear edx for division
             mov ebx, 5 
@@ -63,25 +61,22 @@ output PROC near
 
                 call newline
 
-
   	            push offset bar
-                call printLine
+                call printLine ; prints bar for UI
 
                 call newline
 
                 push row
-                call writeNumber
-                inc row
+                call writeNumber  ; prints row number for UI
+                inc row ; increases row per iteration to print correct row UI
 
                 push offset line
-                call printLine
-
-        ;------------------------------------------------
+                call printLine  ; prints line for UI
 
             if_skip: ; if not on 5(n) iteration
 
             push [boardIndex]
-            call printIndex
+            call printIndex ; prints current board index
 
             inc i                     ; Increment loop counter
             inc boardIndex            ; Increment board index
@@ -91,12 +86,12 @@ output PROC near
     call newline
 
     push offset bar
-    call printLine
+    call printLine ; prints bar UI
 
     call newline
 
     push offset barLetters
-    call printLine
+    call printLine ; prints column letters
 
     call newline
 
@@ -108,54 +103,54 @@ output PROC near
 
 output ENDP
 
+; function that prints array index
 printIndex PROC near
-_printIndex:
 
     push offset space
-    call printLine
+    call printLine  ; prints space for UI
 
     mov eax, offset board
-    add eax, [esp + 4]           ; Offset to the start of Row 2 (row index 1)
-    mov al, [eax]        ; Load the character into DL (value 'g')
+    add eax, [esp + 4]           ; move array index as parameter into eax
+    mov al, [eax]                ; load the character into al (lower 8 bits)
 
-    cmp al, '*'
-    jne not_bomb
-    mov al, ' '
+    cmp al, '*'                  ; compare current index with character '*' to hide bombs from users
+    jne not_bomb                 ; jump to not_bomb label if not not equal
+    mov al, ' '                  ; if '*' exists replace with ' ' 
 
     not_bomb:
         mov boardBuffer, al
-        mov boardBuffer + 1 , 0 ; Add null terminator
+        ;mov boardBuffer + 1 , 0 ; Add null terminator to determine the end of string
         push offset boardBuffer
-        call printLine
-
+        call printLine  ; print index of board aray
 
         push offset space
-        call printLine
+        call printLine ; print space for UI
 
         push offset line
-        call printLine
+        call printLine ; print line for UI
 
         ret 4
 
 printIndex ENDP
 
+; function that prints game data on top of board
 gameData PROC near
 
     push offset playerTitle
-    call printLine
+    call printLine  ; prints player title UI
 
     push player
-    call writeNumber
+    call writeNumber    ; prints current player for UI
 
     push offset roundTitle
-    call printLine
+    call printLine  ; prints title for round UI
 
     mov eax, roundCounter
     push eax
-    call writeNumber
+    call writeNumber    ; prints current round for UI
 
     push offset endDash
-    call printLine
+    call printLine      ; prints dash for UI
 
     call newline
 
